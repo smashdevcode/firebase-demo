@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Firebase Demo</title>
+
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+
+    <script src='https://cdn.firebase.com/v0/firebase.js'></script>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js'></script>
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>    
+
+    <script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js"></script>
+
+</head>
+<body>
+
+<script>
+
+    var myDataRef = new Firebase('https://c27ccv0t1gl.firebaseio-demo.com/');
+
+    myDataRef.on('child_added', function(snapshot) {        
+        var message = snapshot.val();
+        vm.addMessage(message);
+    });
+
+</script>
+
+<div class="container">
+
+    <form class="form">
+
+        <div class="form-group">
+            <label>Name</label>
+            <input data-bind="value: name" type='text' class="form-control"/>
+        </div>
+
+        <div class="form-group">
+            <label>Text</label>
+            <input data-bind="value: text" type='text' class="form-control"/>
+        </div>
+
+        <div>
+            <button class="btn btn-success" data-bind="click: sendMessage">Send Message</button>
+        </div>
+
+    </form>
+
+    <table>
+
+        <tbody data-bind="foreach: messages">
+        
+            <tr>
+                <td data-bind="text: name"></td>
+                <td data-bind="text: text"></td>
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</div>
+
+<script>
+
+function ViewModel() {
+    var self = this;
+
+    self.name = ko.observable();
+    self.text = ko.observable();
+
+    self.m = [ { name: "test", text: "test" }, { name: "test2", text: "test2" }];
+
+    self.messages = ko.observableArray(self.m);
+
+    self.sendMessage = function() {
+        myDataRef.push({ name: self.name(), text: self.text() });
+        self.text(null);
+    };
+
+    self.addMessage = function (newMessage) {
+        self.messages.push({ name: newMessage.name, text: newMessage.text });
+    };
+};
+
+var vm = new ViewModel();
+
+ko.applyBindings(vm);
+
+</script>
+
+</body>
+</html>
